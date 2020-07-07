@@ -12,6 +12,9 @@ import torchvision.utils as utils
 from torch.utils.data import DataLoader
 from tensorboardX import SummaryWriter
 
+os.environ["CUDA_DEVICE_ORDER"] = "PCI_BUS_ID"
+os.environ["CUDA_VISIBLE_DEVICES"] = "0"
+
 # parse arguments
 parser = argparse.ArgumentParser(description="dp_cnn")
 parser.add_argument("training_path", nargs="?", type=str, default="./data/training", help='path of .root data set to be used for training')
@@ -40,14 +43,6 @@ def main():
     #check if it is cpu or gpu
     device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
     print("We are currently using" + device + "for our training...\n")
-
-    # Load dataset
-    print('Loading dataset ...\n')
-    dataset_train = Dataset(train=True)
-    dataset_val = Dataset(train=False)
-    loader_train = DataLoader(dataset=dataset_train, num_workers=4, batch_size=opt.batchSize, shuffle=True)
-    print("# of training samples: %d\n" % int(len(dataset_train)))
-    writer = SummaryWriter(opt.outf)
     
     # Build model
     net = dp_cnn()
@@ -117,4 +112,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-
