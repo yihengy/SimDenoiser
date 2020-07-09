@@ -11,7 +11,7 @@ from torch.autograd import Variable
 #Direct Prediction COnvolutional Network
 class dp_cnn(nn.Module):
 
-    def __init__(self, num_chanels=1, num_layers=9):
+    def __init__(self, num_chanels=1, num_of_layers=9):
         super(dp_cnn,self).__init__()
         
         #ker_size, pad_size, features, and bias_val should be determined by experiment
@@ -30,7 +30,7 @@ class dp_cnn(nn.Module):
         layers.append(nn.Conv2d(in_channels = channels,out_channels = features,kernel_size = ker_size,padding=pad_size, bias = False))
         layers.append(nn.ReLU(inplace=True))
         
-        for t in range num_layers-2
+        for t in range(num_of_layers-2):
             layers.append(nn.Conv2d(in_channels = channels,out_channels = features,kernel_size = ker_size,padding=pad_size, bias = False))
             layers.append(nn.ReLU(inplace=True))
             
