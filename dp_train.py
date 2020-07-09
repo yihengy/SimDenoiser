@@ -4,7 +4,7 @@ import torch.nn as nn
 from torch.autograd import Variable
 from torch.nn import functional as f
 import argparse
-from models import dp_cnn
+from dp_model import dp_cnn
 from dataset import *
 import glob
 import torch.optim as optim
@@ -28,13 +28,13 @@ opt = parser.parse_args()
 def init_weights(m):
     classname = m.__class__.__name__
     if classname.find('Conv') != -1:
-        nn.init.xavier_uniform(m.weight)
+        nn.init.xavier_uniform_(m.weight)
         m.bias.data.fill_(0.01)
     elif classname.find('Linear') != -1:
-        nn.init.xavier_uniform(m.weight)
+        nn.init.xavier_uniform_(m.weight)
         m.bias.data.fill_(0.01)
     elif classname.find('BatchNorm') != -1:
-        nn.init.xavier_uniform(m.weight)
+        nn.init.xavier_uniform_(m.weight)
         m.bias.data.fill_(0.01)
 
 def main():
