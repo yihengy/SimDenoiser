@@ -1,16 +1,15 @@
 import os
-import argparse
-import numpy as np
 import torch
 import torch.nn as nn
-import torch.nn.functional as f
 from torch.autograd import Variable
-import uproot
+from torch.nn import functional as f
+import argparse
+from models import dp_cnn
 from dataset import *
-from dp_model import dp_cnn
-import torchvision.utils as utils
-import matplotlib.pyplot as plt
 import glob
+import torch.optim as optim
+import uproot
+import matplotlib.pyplot as plt
 
 os.environ["CUDA_DEVICE_ORDER"] = "PCI_BUS_ID"
 os.environ["CUDA_VISIBLE_DEVICES"] = "0"
@@ -39,68 +38,68 @@ def init_weights(m):
         m.bias.data.fill_(0.01)
 
 def main():
-    #check if it is cpu or gpu
     device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
-   # print("We are currently using" + device + "for our training...\n")
-    
-    # Build model
-    net = dp_cnn(channels=1, num_of_layers=opt.num_of_layers).to(device)
-    net.apply(init_weights)
-    
-    #I'll be using a built-in loss function to guarantee that it is working
+    model = dp_cnn(channels=1, num_of_layers=opt.num_of_layers).to(device)
+    model.apply(init_weights)
     criterion = nn.MSELoss(size_average=False)
-    criterion.to(device)
-    
-    # Optimizer
+    criterion.to(device=opt.device)
     optimizer = optim.Adam(model.parameters(), lr = opt.lr)
-    # training
+    loss_per_epoch = np.zeros(opt.epochs)
     
+    # train the net
     step = 0
     for epoch in range(opt.epochs):
+        print("Beginning epoch " + str(epoch))
         training_files = glob.glob(os.path.join(opt.training_path, '*.root'))
         for training_file in training_files:
-            print("Filename: "+training_file)
+            print("Opened file " + training_file)
             branch = get_all_histograms(training_file)
             length = np.size(branch)
             for i in range(length):
                 model.train()
                 model.zero_grad()
                 optimizer.zero_grad()
-                # prepare data
-                data = get_bin_weights(branch,0).copy()
-                noisy = add_noise(data, args.sigma).copy()
+                data = get_bin_weights(branch, 0).copy()
+                noisy = add_noise(data, opt.sigma).copy()
                 data = torch.from_numpy(data).to(device)
                 noisy = torch.from_numpy(noisy)
-                noisy = noisy.unsqueeze(0).unsqueeze(1).to(device)
+                noisy = noisy.unsqueeze(0)
+                noisy = noisy.unsqueeze(1).to(device)
                 out_train = model(noisy.float()).to(device)
                 loss = criterion(out_train.squeeze(0).squeeze(0), data)
                 loss.backward()
                 optimizer.step()
                 model.eval()
             model.eval()
+
         # validation
-        validation_files = glob.glob(os.path.join(opt.validation_path,'*root'))
-        total_loss = 0
+        validation_files = glob.glob(os.path.join(opt.validation_path, '*root'))
+        # peak signal to noise ratio
+        epoch_loss = 0
         count = 0
         for validation_file in validation_files:
-            print("Filename: "+validation_file)
-            branch = get_all_histograms(training_file)
+            print("File: " + validation_file)
+            branch = get_all_histograms(validation_file)
             length = np.size(branch)
-            for i in range(length):
-                # prepare data
-                data = get_bin_weights(branch,0).copy()
-                noisy = add_noise(data, args.sigma).copy()
+            for i in range (length):
+                # get data (ground truth)
+                data = get_bin_weights(branch, 0).copy()
+                # add noise
+                noisy = add_noise(data, opt.sigma).copy()
+                # convert to tensor
                 data = torch.from_numpy(data).to(device)
                 noisy = torch.from_numpy(noisy)
-                noisy = noisy.unsqueeze(0).unsqueeze(1).to(device)
+                noisy = noisy.unsqueeze(0)
+                noisy = noisy.unsqueeze(1).to(device)
                 out_train = model(noisy.float()).to(device)
-                total_loss += criterion(out_train.squeeze(0).squeeze(0), data).item()
-            avg_loss = total_loss / length
-           # writer.add_scalar('Loss values on validation data', avg_loss, count)
-            count += 1
+                loss = criterion(out_train.squeeze(0).squeeze(0), data)
+                epoch_loss+=loss.item()
+            epoch_loss/=length
+            count+=1
+        # save the model
         torch.save(model.state_dict(), os.path.join(opt.outf, 'net.pth'))
-        epoch_loss[epoch] = avg_loss
-        print("Epoch #"+str(epoch)+": Average loss: "+str(avg_loss))
+        loss_per_epoch[epoch] = epoch_loss
+        print("Average loss per image in epoch " + str(epoch) + " of " + str(opt.epochs-1) +": "+ str(epoch_loss))
     loss_plot = plt.plot(loss_per_epoch)
     plt.savefig("loss_plot.png")
     
