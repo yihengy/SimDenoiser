@@ -57,24 +57,24 @@ class dp_cnn(nn.Module):
 
 class MyLoss(nn.Module):
     def __initII(self, size_average=None, reduce=None, reduction: str = 'mean') -> None:
-    super(PatchLoss, self).__init__(size_average, reduce, reduction)
+   	 super(PatchLoss, self).__init__(size_average, reduce, reduction)
     
     def forward(self, output, target, patch_size):
      # split output and target images into patches
     #Slice the tensor into patches with patch_size
-    patch_out = output.unfold(0, patch_size, patch_size).unfold(1, patch_size, patch_size)
-    patch_tgt = target.unfold(0, patch_size, patch_size).unfold(1, patch_size, patch_size)
+   	patch_out = output.unfold(0, patch_size, patch_size).unfold(1, patch_size, patch_size)
+	patch_tgt = target.unfold(0, patch_size, patch_size).unfold(1, patch_size, patch_size)
     
     #Calculate the abs_loss of each patches
-    num_patch = patch_tgt.nelement()
-    sum_loss = 0
+	num_patch = patch_tgt.nelement()
+	sum_loss = 0
     
     #sum-up the absolute loss of all the patches
-    for i in range(list(patch_tgt.size())[1]):
-        sum_loss += f.l1_loss(patch_out[0][i],patch_tgt[0][i])
+	for i in range(list(patch_tgt.size())[1]):
+		sum_loss += f.l1_loss(patch_out[0][i],patch_tgt[0][i])
     
     #return the average of the absolute loss of each patches
-    return sum_loss/num_patch
+	return sum_loss/num_patch
     
 
 if __name__=="__main__":
