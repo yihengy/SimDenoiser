@@ -7,10 +7,8 @@ import torch.nn.functional as f
 from torch.autograd import Variable
 import uproot
 from dataset import *
-from dp_model import dp_cnn, MyLoss
+from dp_model import dp_cnn
 import torchvision.utils as utils
-from torch.utils.data import DataLoader
-from tensorboardX import SummaryWriter
 import matplotlib.pyplot as plt
 import glob
 
@@ -43,7 +41,7 @@ def init_weights(m):
 def main():
     #check if it is cpu or gpu
     device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
-    print("We are currently using" + device + "for our training...\n")
+   # print("We are currently using" + device + "for our training...\n")
     
     # Build model
     net = dp_cnn(channels=1, num_of_layers=opt.num_of_layers).to(device)
@@ -56,7 +54,6 @@ def main():
     # Optimizer
     optimizer = optim.Adam(model.parameters(), lr = opt.lr)
     # training
-    writer = SummaryWriter(opt.outf)
     
     step = 0
     for epoch in range(opt.epochs):
@@ -99,7 +96,7 @@ def main():
                 out_train = model(noisy.float()).to(device)
                 total_loss += criterion(out_train.squeeze(0).squeeze(0), data).item()
             avg_loss = total_loss / length
-            writer.add_scalar('Loss values on validation data', avg_loss, count)
+           # writer.add_scalar('Loss values on validation data', avg_loss, count)
             count += 1
         torch.save(model.state_dict(), os.path.join(opt.outf, 'net.pth'))
         epoch_loss[epoch] = avg_loss
