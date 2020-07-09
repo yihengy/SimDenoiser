@@ -54,7 +54,7 @@ class dp_cnn(nn.Module):
         can simply use that value for all layers).
         
     '''
-
+'''
 class MyLoss(nn.Module):
     def __initII(self, size_average=None, reduce=None, reduction: str = 'mean') -> None:
         super(MyLoss, self).__init__(size_average, reduce, reduction)
@@ -75,7 +75,7 @@ class MyLoss(nn.Module):
         
         #return the average of the absolute loss of each patches
         return sum_loss/num_patch
-    
+'''
 
 if __name__=="__main__":
     criterion = MyLoss()

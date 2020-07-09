@@ -3,6 +3,7 @@ import argparse
 import numpy as np
 import torch
 import torch.nn as nn
+import torch.nn.functional as f
 from torch.autograd import Variable
 import uproot
 from dataset import *
@@ -49,7 +50,7 @@ def main():
     net.apply(init_weights)
     
     #I'll be using a built-in loss function to guarantee that it is working
-    criterion = MyLoss()
+    criterion = nn.MSELoss(size_average=False)
     criterion.to(device)
     
     # Optimizer
@@ -75,7 +76,7 @@ def main():
                 noisy = torch.from_numpy(noisy)
                 noisy = noisy.unsqueeze(0).unsqueeze(1).to(device)
                 out_train = model(noisy.float()).to(device)
-                loss = criterion(out_train.squeeze(0).squeeze(0), data, 5)
+                loss = criterion(out_train.squeeze(0).squeeze(0), data)
                 loss.backward()
                 optimizer.step()
                 model.eval()
@@ -96,7 +97,7 @@ def main():
                 noisy = torch.from_numpy(noisy)
                 noisy = noisy.unsqueeze(0).unsqueeze(1).to(device)
                 out_train = model(noisy.float()).to(device)
-                total_loss += criterion(out_train.squeeze(0).squeeze(0), data, 5).item()
+                total_loss += criterion(out_train.squeeze(0).squeeze(0), data).item()
             avg_loss = total_loss / length
             writer.add_scalar('Loss values on validation data', avg_loss, count)
             count += 1
