@@ -57,7 +57,7 @@ class dp_cnn(nn.Module):
 
 class MyLoss(nn.Module):
     def __initII(self, size_average=None, reduce=None, reduction: str = 'mean') -> None:
-        super(PatchLoss, self).__init__(size_average, reduce, reduction)
+        super(MyLoss, self).__init__(size_average, reduce, reduction)
     
     def forward(self, output, target, patch_size):
         # split output and target images into patches
