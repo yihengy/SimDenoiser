@@ -31,6 +31,7 @@ parser.add_argument("--batchSize", type=int, default=100, help="Training batch s
 parser.add_argument("--model", type=str, default=None, help="Existing model, if applicable")
 args = parser.parse_args()
 
+'''
 def init_weights(m):
     classname = m.__class__.__name__
     if classname.find('Conv') != -1:
@@ -39,6 +40,11 @@ def init_weights(m):
         nn.init.xavier_uniform_(m.weight)
     elif classname.find('BatchNorm') != -1:
         nn.init.xavier_uniform_(m.weight)
+'''
+def init_weights(m):
+    if type(m) == nn.Linear:
+    torch.nn.init.xavier_uniform(m.weight)
+    m.bias.data.fill_(0.01)
 
 def main():
     # choose cpu or gpu
