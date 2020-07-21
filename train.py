@@ -5,7 +5,7 @@ import torch
 import torch.nn as nn
 from torch.autograd import Variable
 from torch.nn import functional as f
-from models import DnCNN, PatchLoss
+from models import DnCNN, PatchLoss, WeightedPatchLoss
 from dataset import *
 import glob
 import torch.optim as optim
@@ -23,7 +23,7 @@ parser.add_argument("validation_path", nargs="?", type=str, default="./data/vali
 parser.add_argument("--num_of_layers", type=int, default=9, help="Number of total layers")
 parser.add_argument("--sigma", type=float, default=10, help='noise level')
 parser.add_argument("--outf", type=str, default="logs", help='path of log files')
-parser.add_argument("--epochs", type=int, default=30, help="Number of training epochs")
+parser.add_argument("--epochs", type=int, default=50, help="Number of training epochs")
 parser.add_argument("--lr", type=float, default=1e-3, help="Initial learning rate")
 parser.add_argument("--trainfile", type=str, default="test.root", help='path of .root file for training')
 parser.add_argument("--valfile", type=str, default="test.root", help='path of .root file for validation')
@@ -70,7 +70,7 @@ def main():
         model.eval()
 
     # Loss function
-    criterion = PatchLoss()
+    criterion = WeightedPatchLoss()
     criterion.to(device=args.device)
 
     #Optimizer
@@ -111,11 +111,11 @@ def main():
         print("Validation: "+ str(val_loss/len(val_train)))
         # save the model
         model.eval()
-        torch.save(model.state_dict(), os.path.join(args.outf, 'net_721_1.pth'))
+        torch.save(model.state_dict(), os.path.join(args.outf, 'net_721_2.pth'))
     training = plt.plot(training_losses, label='training')
     validation = plt.plot(validation_losses, label='validation')
     plt.legend()
-    plt.savefig("lossplt_721_1.png")
+    plt.savefig("lossplt_721_2.png")
 
     #make some images and store to csv
     
@@ -123,15 +123,15 @@ def main():
     for image in range(10):
         model.to('cpu')
         data = get_bin_weights(branch, image).copy()
-        np.savetxt('logs/7_21_1_truth#' + str(image) + '.txt', data)
+        np.savetxt('logs/7_21_2_truth#' + str(image) + '.txt', data)
         noisy = add_noise(data, args.sigma).copy()
-        np.savetxt('logs/7_21_1_noised#' + str(image) + '.txt', noisy)
+        np.savetxt('logs/7_21_2_noised#' + str(image) + '.txt', noisy)
         data = torch.from_numpy(data)
         noisy = torch.from_numpy(noisy)
         noisy = noisy.unsqueeze(0)
         noisy = noisy.unsqueeze(1)
         output = model(noisy.float()).squeeze(0).squeeze(0).detach().numpy()
-        np.savetxt('logs/7_21_1_denoised#' + str(image) + '.txt', output)
+        np.savetxt('logs/7_21_2_denoised#' + str(image) + '.txt', output)
     
     
 if __name__ == "__main__":
