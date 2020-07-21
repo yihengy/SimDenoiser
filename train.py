@@ -43,8 +43,8 @@ def init_weights(m):
 '''
 def init_weights(m):
     if type(m) == nn.Linear:
-    torch.nn.init.xavier_uniform(m.weight)
-    m.bias.data.fill_(0.01)
+        torch.nn.init.xavier_uniform(m.weight)
+        m.bias.data.fill_(0.01)
 
 def main():
     # choose cpu or gpu
