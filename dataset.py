@@ -1,13 +1,10 @@
-'''
-adapted from https://github.com/lenafranklin/SimDenoising_training/blob/master/dataset.py
-'''
-
 import numpy as np
 import uproot
 import matplotlib.pyplot as plt
 import matplotlib as mpl
 import random
 import torch.utils.data as udata
+import torch
 
 def get_all_histograms(file_path):
     file = uproot.rootio.open(file_path)
@@ -37,3 +34,17 @@ def get_bin_weights(branch, n):
 
 def add_noise(data, sigma):
     return np.clip(data + np.random.normal(loc=0.0,scale=sigma, size=[100,100]), a_min=0, a_max=None);
+
+class RootDataset(udata.Dataset):
+    def __init__(self, root_file, sigma):
+        self.root_file = root_file
+        self.sigma = sigma
+        self.histograms = get_all_histograms(root_file)
+
+    def __len__(self):
+        return len(self.histograms)
+
+    def __getitem__(self, idx):
+        truth = torch.from_numpy(get_bin_weights(self.histograms, idx).copy())
+        noisy = torch.from_numpy(add_noise(get_bin_weights(self.histograms, idx), self.sigma).copy())
+        return truth, noisy
