@@ -11,7 +11,7 @@ class DnCNN(nn.Module):
         super(DnCNN, self).__init__()
         kernel_size = 5
         padding = 2
-        features = 100
+        features = 500
         layers = []
         layers.append(nn.Conv2d(in_channels=channels, out_channels=features, kernel_size=kernel_size, padding=padding, bias=False))
         layers.append(nn.ReLU(inplace=True))
@@ -25,7 +25,8 @@ class DnCNN(nn.Module):
     def forward(self, x):
         out = self.dncnn(x)
         return out
-'''
+
+
 class PatchLoss(nn.Module):
     def __initII(self, size_average=None, reduce=None, reduction: str = 'mean') -> None:
         super(PatchLoss, self).__init__(size_average, reduce, reduction)
@@ -42,9 +43,10 @@ class PatchLoss(nn.Module):
             avg_loss+=max_patch_loss
         avg_loss/=(list(output_patches.size())[0] * (list(output_patches.size())[1]))
         return avg_loss;
+
+
+
 '''
-
-
 class PatchLoss(nn.Module):
     def __initII(self, size_average=None, reduce=None, reduction: str = 'mean') -> None:
         super(PatchLoss, self).__init__(size_average, reduce, reduction)
@@ -67,7 +69,7 @@ class PatchLoss(nn.Module):
                 max_patch_loss = max(max_patch_loss, tmp)
                 #print("Max after this patch: " + str(max_patch_loss))
         return max_patch_loss
-
+'''
 
 class WeightedPatchLoss(nn.Module):
     def __initII(self, size_average=None, reduce=None, reduction: str = 'mean') -> None:
