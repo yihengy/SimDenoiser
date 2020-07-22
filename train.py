@@ -23,7 +23,7 @@ parser = argparse.ArgumentParser(description="DnCNN")
 parser.add_argument("--num_of_layers", type=int, default=9, help="Number of total layers")
 parser.add_argument("--sigma", type=float, default=10, help='noise level')
 parser.add_argument("--outf", type=str, default="logs", help='path of log files')
-parser.add_argument("--epochs", type=int, default=30, help="Number of training epochs")
+parser.add_argument("--epochs", type=int, default=25, help="Number of training epochs")
 parser.add_argument("--lr", type=float, default=1e-3, help="Initial learning rate")
 parser.add_argument("--trainfile", type=str, default="./data/training", help='path of .root file for training')
 parser.add_argument("--valfile", type=str, default="./data/validation", help='path of .root file for validation')
@@ -116,7 +116,7 @@ def main():
     training = plt.plot(training_losses, label='training')
     validation = plt.plot(validation_losses, label='validation')
     plt.legend()
-    plt.savefig("lossplt_721_2.png")
+    plt.savefig("lossplt_722_2.png")
 
     #make some images and store to csv
     
