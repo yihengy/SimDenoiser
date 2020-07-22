@@ -93,7 +93,7 @@ def main():
             truth, noise = data
             noise = noise.unsqueeze(1)
             output = model(noise.float().to(args.device))
-            batch_loss = criterion(output.squeeze(1).to(args.device), truth.to(args.device),5).to(args.device)
+            batch_loss = criterion(output.squeeze(1).to(args.device), truth.to(args.device),25).to(args.device)
             train_loss += batch_loss.item()
             batch_loss.backward()
             optimizer.step()
@@ -105,7 +105,7 @@ def main():
         for i, data in enumerate(val_train, 0):
             val_truth, val_noise =  data
             val_output = model(val_noise.unsqueeze(1).float().to(args.device))
-            output_loss = criterion(val_output.squeeze(1).to(args.device), val_truth.to(args.device),5).to(args.device)
+            output_loss = criterion(val_output.squeeze(1).to(args.device), val_truth.to(args.device),25).to(args.device)
             val_loss+=output_loss.item()
         scheduler.step(torch.tensor([val_loss]))
         validation_losses[epoch] = val_loss/len(val_train)
