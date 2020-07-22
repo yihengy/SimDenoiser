@@ -1,8 +1,4 @@
-import torch
-import torch.nn as nn
-from torch.autograd import Variable
-from torch.nn import functional as f
-import numpy as np
+
 
 '''
 class PatchLoss(nn.Module):
@@ -33,6 +29,12 @@ class PatchLoss(nn.Module):
         avg_loss/=(list(output_patches.size())[0] * (list(output_patches.size())[1]))
         return avg_loss;
 '''
+
+import torch
+import torch.nn as nn
+from torch.autograd import Variable
+from torch.nn import functional as f
+import numpy as np
 
 class PatchLoss(nn.Module):
     def __initII(self, size_average=None, reduce=None, reduction: str = 'mean') -> None:
