@@ -50,22 +50,22 @@ class PatchLoss(nn.Module):
         super(PatchLoss, self).__init__(size_average, reduce, reduction)
 
     def forward(self, output, target, patch_size):
-        avg_loss = 0
+        #avg_loss = 0
         output_patches = output.unfold(0, patch_size, patch_size).unfold(1, patch_size, patch_size)
         target_patches = target.unfold(0, patch_size, patch_size).unfold(1, patch_size, patch_size)
         max_patch_loss = 0
         for i in range(list(output_patches.size())[0]):
             for j in range(list(output_patches.size())[1]):
-                print("Patch Tag: i = "+str(i)+", j = "+str(j)+":")
-                print("Output Patch:")
-                print(output_patches[i][j])
-                print("Target Patch:")
-                print(target_patches[i][j])
+                #print("Patch Tag: i = "+str(i)+", j = "+str(j)+":")
+                #print("Output Patch:")
+                #print(output_patches[i][j])
+                #print("Target Patch:")
+                #print(target_patches[i][j])
                 tmp = f.l1_loss(output_patches[i][j],target_patches[i][j])
-                print("L1loss de Patch:"+str(tmp))
-                print("Max before this patch: " + str(max_patch_loss))
+                #print("L1loss de Patch:"+str(tmp))
+                #print("Max before this patch: " + str(max_patch_loss))
                 max_patch_loss = max(max_patch_loss, tmp)
-                print("Max after this patch: " + str(max_patch_loss))
+                #print("Max after this patch: " + str(max_patch_loss))
         return max_patch_loss
 
 
