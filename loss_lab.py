@@ -33,7 +33,6 @@ class PatchLoss(nn.Module):
                     max_patch_loss = max(max_patch_loss, tmp)
                     print("Max after this patch: " + str(max_patch_loss))
             avg_loss+=max_patch_loss
-        total =
         avg_loss/=(list(output_patches.size())[0] * (list(output_patches.size())[1]))
         return avg_loss;
 
