@@ -21,7 +21,7 @@ FAILED
 July 22: Experiment 7-22-1
 
 Epoch = 50
-loss: buitin l1_loss
+loss: buitin MSE
 kersize = 5
 
 
