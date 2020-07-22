@@ -70,7 +70,7 @@ def main():
         model.eval()
 
     # Loss function
-    criterion = f.l1_loss()
+    criterion = nn.L1loss(size_average=None, reduce=None, reduction: str = 'mean')
     criterion.to(device=args.device)
 
     #Optimizer
