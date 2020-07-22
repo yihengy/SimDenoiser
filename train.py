@@ -70,7 +70,7 @@ def main():
         model.eval()
 
     # Loss function
-    criterion = WeightedPatchLoss()
+    criterion = f.l1_loss()
     criterion.to(device=args.device)
 
     #Optimizer
@@ -92,7 +92,7 @@ def main():
             truth, noise = data
             noise = noise.unsqueeze(1)
             output = model(noise.float().to(args.device))
-            batch_loss = criterion(output.squeeze(1).to(args.device), truth.to(args.device), 10).to(args.device)
+            batch_loss = criterion(output.squeeze(1).to(args.device), truth.to(args.device)).to(args.device)
             train_loss += batch_loss.item()
             batch_loss.backward()
             optimizer.step()
@@ -104,14 +104,14 @@ def main():
         for i, data in enumerate(val_train, 0):
             val_truth, val_noise =  data
             val_output = model(val_noise.unsqueeze(1).float().to(args.device))
-            output_loss = criterion(val_output.squeeze(1).to(args.device), val_truth.to(args.device), 10).to(args.device)
+            output_loss = criterion(val_output.squeeze(1).to(args.device), val_truth.to(args.device)).to(args.device)
             val_loss+=output_loss.item()
         scheduler.step(torch.tensor([val_loss]))
         validation_losses[epoch] = val_loss/len(val_train)
         print("Validation: "+ str(val_loss/len(val_train)))
         # save the model
         model.eval()
-        torch.save(model.state_dict(), os.path.join(args.outf, 'net_721_2.pth'))
+        torch.save(model.state_dict(), os.path.join(args.outf, 'net_722_1.pth'))
     training = plt.plot(training_losses, label='training')
     validation = plt.plot(validation_losses, label='validation')
     plt.legend()
@@ -123,15 +123,15 @@ def main():
     for image in range(10):
         model.to('cpu')
         data = get_bin_weights(branch, image).copy()
-        np.savetxt('logs/7_21_2_truth#' + str(image) + '.txt', data)
+        np.savetxt('logs/7_22_1_truth#' + str(image) + '.txt', data)
         noisy = add_noise(data, args.sigma).copy()
-        np.savetxt('logs/7_21_2_noised#' + str(image) + '.txt', noisy)
+        np.savetxt('logs/7_22_1_noised#' + str(image) + '.txt', noisy)
         data = torch.from_numpy(data)
         noisy = torch.from_numpy(noisy)
         noisy = noisy.unsqueeze(0)
         noisy = noisy.unsqueeze(1)
         output = model(noisy.float()).squeeze(0).squeeze(0).detach().numpy()
-        np.savetxt('logs/7_21_2_denoised#' + str(image) + '.txt', output)
+        np.savetxt('logs/7_22_1_denoised#' + str(image) + '.txt', output)
     
     
 if __name__ == "__main__":
