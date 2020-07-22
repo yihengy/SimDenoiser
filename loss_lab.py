@@ -35,7 +35,7 @@ import torch.nn as nn
 from torch.autograd import Variable
 from torch.nn import functional as f
 import numpy as np
-
+'''
 class PatchLoss(nn.Module):
     def __initII(self, size_average=None, reduce=None, reduction: str = 'mean') -> None:
         super(PatchLoss, self).__init__(size_average, reduce, reduction)
@@ -58,14 +58,39 @@ class PatchLoss(nn.Module):
                 max_patch_loss = max(max_patch_loss, tmp)
                 print("Max after this patch: " + str(max_patch_loss))
         return max_patch_loss
+'''
+
+class PatchLoss(nn.Module):
+    def __initII(self, size_average=None, reduce=None, reduction: str = 'mean') -> None:
+        super(PatchLoss, self).__init__(size_average, reduce, reduction)
+
+    def forward(self, output, target, patch_size):
+        avg_loss = 0
+        for i in range(len(output)):
+            # split output and target images into patches
+            output_patches = output[i].unfold(0, patch_size, patch_size).unfold(1, patch_size, patch_size)
+            print("o:")
+            print(output_patches)
+            target_patches = target[i].unfold(0, patch_size, patch_size).unfold(1, patch_size, patch_size)
+            print("t:")
+            print(target_patches)
+            max_patch_loss = 0
+            # calculate loss for each patch of the image
+            for j in range(list(output_patches.size())[0]):
+                for k in range(list(output_patches.size())[1]):
+                    max_patch_loss = max(max_patch_loss, f.l1_loss(output_patches[j][k], target_patches[j][k]))
+            avg_loss+=max_patch_loss
+        avg_loss/=len(output)
+        print(avg_loss)
+        return avg_loss;
 
 if __name__ == "__main__":
     criterion = PatchLoss()
     dtype = torch.FloatTensor
     # Ordinary Check
-    x = Variable(torch.randn(5, 5).type(dtype), requires_grad=False)
+    x = Variable(torch.randn(9, 9).type(dtype), requires_grad=False)
     print(x)
-    y = Variable(torch.randn(5, 5).type(dtype), requires_grad=False)
+    y = Variable(torch.randn(9, 9).type(dtype), requires_grad=False)
     print(y)
     loss = criterion(x,y,3)
     print(loss)
