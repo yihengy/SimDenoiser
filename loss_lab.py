@@ -2,11 +2,8 @@ import torch
 import torch.nn as nn
 from torch.autograd import Variable
 from torch.nn import functional as f
-from dataset import *
-from torch.utils.data import DataLoader
 import numpy as np
-from models import DnCNN
-import torch.optim as optim
+
 
 class PatchLoss(nn.Module):
     def __initII(self, size_average=None, reduce=None, reduction: str = 'mean') -> None:
@@ -17,8 +14,8 @@ class PatchLoss(nn.Module):
         print("length:")
         print(len(output))
         for i in range(len(output)):
-            output_patches = output[i].unfold(0, patch_size, patch_size).unfold(1, patch_size, patch_size)
-            target_patches = target[i].unfold(0, patch_size, patch_size).unfold(1, patch_size, patch_size)
+            output_patches = output[i].unfold(0,3,3).unfold(1, patch_size, patch_size).unfold(2, patch_size, patch_size)
+            target_patches = target[i].unfold(0,3,3).unfold(1, patch_size, patch_size).unfold(2, patch_size, patch_size)
             max_patch_loss = 0
             for i in range(list(output_patches.size())[0]):
                 for j in range(list(output_patches.size())[1]):
@@ -38,13 +35,13 @@ class PatchLoss(nn.Module):
 
 if __name__ == "__main__":
     criterion = PatchLoss()
-    dtype = torch.IntTensor
+    dtype = torch.FloatTensor
     # Ordinary Check
-    x = Variable(torch.randn(25, 25).type(dtype), requires_grad=False)
+    x = Variable(torch.randn(12, 12).type(dtype), requires_grad=False)
     print(x)
-    y = Variable(torch.randn(25, 25).type(dtype), requires_grad=False)
+    y = Variable(torch.randn(12, 12).type(dtype), requires_grad=False)
     print(y)
-    loss = criterion(x,y,5)
+    loss = criterion(x,y,3)
     print(loss)
     print("Finish testing.")
     
