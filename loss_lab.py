@@ -61,11 +61,11 @@ if __name__ == "__main__":
     criterion = PatchLoss()
     dtype = torch.FloatTensor
     # Ordinary Check
-    x = Variable(torch.randn(4, 4).type(dtype), requires_grad=False)
+    x = Variable(torch.randn(5, 5).type(dtype), requires_grad=False)
     print(x)
-    y = Variable(torch.randn(4, 4).type(dtype), requires_grad=False)
+    y = Variable(torch.randn(5, 5).type(dtype), requires_grad=False)
     print(y)
-    loss = criterion(x,y,2)
+    loss = criterion(x,y,3)
     print(loss)
     print("Finish testing.")
     
