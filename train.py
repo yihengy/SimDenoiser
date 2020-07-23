@@ -77,7 +77,7 @@ def main():
     #Optimizer
     MyOptim = optim.Adam(model.parameters(), lr = args.lr)
     decay_rate = 0.95
-    MyScheduler = optim.lr_scheduler.ExponentialLR(optimizer=optimizer, gamma=decay_rate)
+    MyScheduler = optim.lr_scheduler.ExponentialLR(optimizer=MyOptim, gamma=decay_rate)
 
     # training and validation
     step = 0
