@@ -75,8 +75,9 @@ def main():
     criterion.to(device=args.device)
 
     #Optimizer
-    optimizer = optim.Adam(model.parameters(), lr = args.lr)
-    #scheduler = optim.lr_scheduler.ReduceLROnPlateau(optimizer=optimizer, factor=0.1, patience=10, verbose=True)
+    MyOptim = optim.Adam(model.parameters(), lr = args.lr)
+    decay_rate = 0.95
+    MyScheduler = optim.lr_scheduler.ExponentialLR(optimizer=optimizer, gamma=decay_rate)
 
     # training and validation
     step = 0
@@ -89,14 +90,14 @@ def main():
         for i, data in enumerate(loader_train, 0):
             model.train()
             model.zero_grad()
-            optimizer.zero_grad()
+            MyOptim.zero_grad()
             truth, noise = data
             noise = noise.unsqueeze(1)
             output = model(noise.float().to(args.device))
             batch_loss = criterion(output.squeeze(1).to(args.device), truth.to(args.device),25).to(args.device)
             train_loss += batch_loss.item()
             batch_loss.backward()
-            optimizer.step()
+            MyOptim.step()
             model.eval()
         training_losses[epoch] = train_loss/len(dataset_train)
         print("Train: "+ str(train_loss/len(dataset_train)))
@@ -107,7 +108,8 @@ def main():
             val_output = model(val_noise.unsqueeze(1).float().to(args.device))
             output_loss = criterion(val_output.squeeze(1).to(args.device), val_truth.to(args.device),25).to(args.device)
             val_loss+=output_loss.item()
-        #scheduler.step(torch.tensor([val_loss]))
+        #MyScheduler.step(torch.tensor([val_loss]))
+        MyScheduler.step()
         validation_losses[epoch] = val_loss/len(val_train)
         print("Validation: "+ str(val_loss/len(val_train)))
         # save the model
@@ -116,7 +118,7 @@ def main():
     training = plt.plot(training_losses, label='training')
     validation = plt.plot(validation_losses, label='validation')
     plt.legend()
-    plt.savefig("lossplt_LOTfeatures.png")
+    plt.savefig("lossplt_lr+LOTfeatures.png")
 
     #make some images and store to csv
     
@@ -124,15 +126,15 @@ def main():
     for image in range(10):
         model.to('cpu')
         data = get_bin_weights(branch, image).copy()
-        np.savetxt('logs/LOTfeatures_truth#' + str(image) + '.txt', data)
+        np.savetxt('logs/lr+LOTfeatures_truth#' + str(image) + '.txt', data)
         noisy = add_noise(data, args.sigma).copy()
-        np.savetxt('logs/LOTfeatures_noised#' + str(image) + '.txt', noisy)
+        np.savetxt('logs/lr+LOTfeatures_noised#' + str(image) + '.txt', noisy)
         data = torch.from_numpy(data)
         noisy = torch.from_numpy(noisy)
         noisy = noisy.unsqueeze(0)
         noisy = noisy.unsqueeze(1)
         output = model(noisy.float()).squeeze(0).squeeze(0).detach().numpy()
-        np.savetxt('logs/LOTfeatures_denoised#' + str(image) + '.txt', output)
+        np.savetxt('logs/lr+LOTfeatures_denoised#' + str(image) + '.txt', output)
     
     
 if __name__ == "__main__":
