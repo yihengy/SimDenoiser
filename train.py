@@ -107,7 +107,7 @@ def main():
             val_output = model(val_noise.unsqueeze(1).float().to(args.device))
             output_loss = criterion(val_output.squeeze(1).to(args.device), val_truth.to(args.device),25).to(args.device)
             val_loss+=output_loss.item()
-        scheduler.step(torch.tensor([val_loss]))
+        #scheduler.step(torch.tensor([val_loss]))
         validation_losses[epoch] = val_loss/len(val_train)
         print("Validation: "+ str(val_loss/len(val_train)))
         # save the model
