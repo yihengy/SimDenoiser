@@ -11,7 +11,7 @@ class DnCNN(nn.Module):
         super(DnCNN, self).__init__()
         kernel_size = 5
         padding = 2
-        features = 200
+        features = 150
         layers = []
         layers.append(nn.Conv2d(in_channels=channels, out_channels=features, kernel_size=kernel_size, padding=padding, bias=False))
         layers.append(nn.ReLU(inplace=True))
