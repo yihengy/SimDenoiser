@@ -13,6 +13,8 @@ import uproot
 import matplotlib.pyplot as plt
 from torch.utils.data import DataLoader
 
+#torch.set_default_tensor_type(torch.DoubleTensor)
+
 os.environ["CUDA_DEVICE_ORDER"] = "PCI_BUS_ID"
 os.environ["CUDA_VISIBLE_DEVICES"] = "0"
 
@@ -93,7 +95,8 @@ def main():
             MyOptim.zero_grad()
             truth, noise = data
             noise = noise.unsqueeze(1)
-            output = model(noise.float().to(args.device))
+            #output = model(noise.float().to(args.device))
+            output = model(noise.float().to(args.device)).double()
             #batch_loss = criterion(output.squeeze(1).to(args.device), truth.to(args.device),25).to(args.device)
             batch_loss = criterion(output.squeeze(1).to(args.device), truth.to(args.device)).to(args.device)
             train_loss += batch_loss.item()
@@ -106,7 +109,8 @@ def main():
         val_loss = 0
         for i, data in enumerate(val_train, 0):
             val_truth, val_noise =  data
-            val_output = model(val_noise.unsqueeze(1).float().to(args.device))
+            #val_output = model(val_noise.unsqueeze(1).float().to(args.device))
+            val_output = model(val_noise.unsqueeze(1).float().to(args.device)).double()
             #output_loss = criterion(val_output.squeeze(1).to(args.device), val_truth.to(args.device),25).to(args.device)
             output_loss = criterion(val_output.squeeze(1).to(args.device), val_truth.to(args.device)).to(args.device)
             val_loss+=output_loss.item()
