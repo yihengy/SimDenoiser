@@ -70,7 +70,7 @@ def main():
         model.eval()
 
     # Loss function
-    criterion = nn.MSELoss(size_average=False)
+    criterion = nn.l1_loss(size_average=False)
     #criterion = PatchLoss()
     criterion.to(device=args.device)
 
