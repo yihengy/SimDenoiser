@@ -72,7 +72,7 @@ def main():
         model.eval()
 
     # Loss function
-    criterion = nn.SmoothL1Loss(size_average=None)
+    criterion = nn.MSELoss(size_average=None)
     #criterion = PatchLoss()
     criterion.to(device=args.device)
 
