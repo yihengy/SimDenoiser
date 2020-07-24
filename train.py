@@ -23,7 +23,7 @@ parser = argparse.ArgumentParser(description="DnCNN")
 parser.add_argument("--num_of_layers", type=int, default=9, help="Number of total layers")
 parser.add_argument("--sigma", type=float, default=10, help='noise level')
 parser.add_argument("--outf", type=str, default="logs", help='path of log files')
-parser.add_argument("--epochs", type=int, default=30, help="Number of training epochs")
+parser.add_argument("--epochs", type=int, default=1, help="Number of training epochs")
 parser.add_argument("--lr", type=float, default=1e-3, help="Initial learning rate")
 parser.add_argument("--trainfile", type=str, default="./data/training/part1.root", help='path of .root file for training')
 parser.add_argument("--valfile", type=str, default="./data/validation/part2.root", help='path of .root file for validation')
@@ -114,28 +114,27 @@ def main():
         print("Validation: "+ str(val_loss/len(val_train)))
         # save the model
         model.eval()
-        torch.save(model.state_dict(), os.path.join(args.outf, 'net_LOTfeatures.pth'))
+        torch.save(model.state_dict(), os.path.join(args.outf, 'net_1epoch.pth'))
     training = plt.plot(training_losses, label='training')
     validation = plt.plot(validation_losses, label='validation')
     plt.legend()
-    plt.savefig("lossplt_lr+LOTfeatures.png")
+    plt.savefig("lossplt_1epoch.png")
 
     #make some images and store to csv
     
     branch = get_all_histograms("test.root")
-    for image in range(10):
+    for image in range(3):
         model.to('cpu')
         data = get_bin_weights(branch, image).copy()
-        np.savetxt('logs/lr+LOTfeatures_truth#' + str(image) + '.txt', data)
+        np.savetxt('logs/1epoch_truth#' + str(image) + '.txt', data)
         noisy = add_noise(data, args.sigma).copy()
-        np.savetxt('logs/lr+LOTfeatures_noised#' + str(image) + '.txt', noisy)
+        np.savetxt('logs/1epoch_noised#' + str(image) + '.txt', noisy)
         data = torch.from_numpy(data)
         noisy = torch.from_numpy(noisy)
         noisy = noisy.unsqueeze(0)
         noisy = noisy.unsqueeze(1)
         output = model(noisy.float()).squeeze(0).squeeze(0).detach().numpy()
-        np.savetxt('logs/lr+LOTfeatures_denoised#' + str(image) + '.txt', output)
-    
+        np.savetxt('1epoch_denoised#' + str(image) + '.txt', output)
     
 if __name__ == "__main__":
     main()
